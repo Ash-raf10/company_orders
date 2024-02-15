@@ -1,66 +1,363 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+##  Guideline
+Though Laravel is a well organized framework, and it follows all the
+community standards we should also follow some standards to make
+the code more readable and understandable.
+We will follow the [PSR-2](https://www.php-fig.org/psr/psr-2/) and [PSR-12](https://www.php-fig.org/psr/psr-12/) standard as well.
+We will also make sure that we are following 
+"[SOLID](https://www.freecodecamp.org/news/solid-principles-explained-in-plain-english/) [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) [KISS](https://dev.to/kwereutosu/the-k-i-s-s-principle-in-programming-1jfg)" 
+method and/or principles.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### An excellent example of DRY method in Laravel:
+```injectablephp
+public function store()
+{
+      $data = request()->validate([
+            'id' => 'required|integer',
+            'name' => 'required',
+            'email' => 'email',
+            'password' => 'required',
+            'role' => 'string'
+        ]);
 
-## About Laravel
+        \App\User::create($data);
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+        return redirect('/users');
+ }
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+public function update(\App\User $user)
+    {
+        $data = request()->validate([
+            'id' => 'required|integer',
+            'name' => 'required',
+            'email' => 'email',
+            'role' => 'string'
+        ]);
 
-## Learning Laravel
+        $user->update($data);
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+        return redirect('/users');
+    }
+```
+We can use Laravel Form Request to make this class more clean and make sure this is following DRY method.
+We can create a form request here. ```php artisan make:request UserRequest```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+And for the rules we can add this:
+```injectablephp
+public function rules()
+{
+    $rules = [
+            'id' => 'required|integer',
+            'name' => 'required',
+            'email' => 'email',
+            'role' => 'string'
+        ];
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    if ($this->isMethod('post'))
+    {
+        $rules['password'] = 'required';
+    }
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+    return $rules;
+}
+```
+Then our method signatures will be changed:
+```injectablephp
+use App\Http\Requests\UserRequest;
 
-### Premium Partners
+public function store(UserRequest $request)
+{
+    \App\User::create($request->all());
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+    return redirect('/users');
+}
 
-## Contributing
+public function update(UserRequest $request, \App\User $user)
+{
+    $user->update($request->all());
+    
+    return redirect('/users');
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+### [Some naming conventions and best practices](https://devdojo.com/alpdetails/laravel-best-practice-coding-standards-part-01)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### Naming Conventions. ✊
+Here we will talk about naming conventions about PHP. 
+Following conventions accepted by the Laravel community.
 
-## Security Vulnerabilities
+##### 01.01 Controller 👈
+- Name should be in singular form.
+- Should use PascalCase.
+```injectablephp
+//Should Do
+"CustomerController.php"
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+//Shouldn't Do
+"CustomersController.php"
+```
 
-## License
+##### 01.02 Route 👈
+###### 01.02.01 Route Url 👈
+- Url should be in plural form.
+- Can use kebab-case if there are two words in a single part For Best Practice.
+```injectablephp
+//Should Do
+"https://devdojo.com/customers/25"
+"https://devdojo.com/customers/password-reset"
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+//Shouldn't Do
+"https://devdojo.com/customer/25"
+"https://devdojo.com/customers/passwordReset"
+```
+
+###### 01.02.02 Route Name 👈
+- Should use snake_case with dot notation.
+- Better to use the same name as in the URL.
+```injectablephp
+//Should Do
+->('customers.view');
+->('customers.password_reset');
+
+//Should't Do
+->('customers-view');
+->('customers_view');
+->('customers.password.reset');
+->('customers.password-reset');
+->('customer-password-reset');
+```
+
+##### 01.03 DataBase Related 👈
+###### 01.03.01 Migration 👈
+- Should use the name as what you want to do with snake_case.
+```injectablephp
+//Should Do
+"2021_03_19_033513_create_customers_table.php"
+"2021_03_19_033513_add_image_id_to_customers_table.php"
+"2021_03_19_033513_drop_image_id_from_customers_table.php"
+
+//Shouldn't Do
+"2021_03_19_033513_customers.php"
+"2021_03_19_033513_add_image_id_customers.php"
+"2021_03_19_033513_remove_image_id_customers.php"
+```
+
+###### 01.03.02 Table 👈
+- Table name must be in plural form.
+- Should use snake_case.
+```injectablephp
+//Should Do
+"customers","cart_items"
+
+//Shouldn't Do
+"customer" ,"cartItems","CartItems","Cart_item"
+```
+
+###### 01.03.03 Pivot Table 👈
+- Table name must be in singular form.
+- Should use snake_case
+- Names should be in alphabetical Order.
+```injectablephp
+//Should Do
+"course_student"
+
+//Shouldn't Do
+"student_courses","students_courses","course_students",
+```
+
+###### 01.03.04 Table Columns 👈
+- Should use snake_case.
+- Should not use table name with column names.
+- Readable name can be used for better practice.
+```injectablephp
+//Should Do
+"first_name"
+
+//Shouldn't Do
+"user_first_name","FirstName"
+```
+
+###### 01.03.05 Foreign key 👈
+- Should use snake_case.
+- Should use singular table name with id prefix.
+```injectablephp
+//Should Do
+"course_id"
+
+//Shouldn't Do
+"courseId","id","courses_id","id_course"
+```
+
+###### 01.03.06 Primary key 👈
+- Only use the name as the id.
+```injectablephp
+//Should Do
+"id"
+
+//Shouldn't Do
+"custom_name_id"
+```
+
+###### 01.03.07 Model 👈
+- Model name must be in singular form.
+- Should Use PascalCase
+- Model name must be a singular form or table name.
+```injectablephp
+//Should Do
+"Customer"
+
+//Shouldn't Do
+"Customers" ,"customer"
+```
+
+###### 01.03.08 Model Single relations [Has One, Belongs To] 👈
+- Method name must be in singular form.
+- Should Use camalCase
+```injectablephp
+//Should Do
+"studentCourse"
+
+//Shouldn't Do
+"StudentCourse" ,"student_course" ,"studentCourses"
+```
+
+###### 01.03.09 Model all other relations and methods [Has Many, other] 👈
+- Method name must be in plural form.
+- Should use camalCase
+```injectablephp
+//Should Do
+"cartItems"
+
+//Shouldn't Do
+"CartItem" ,"cart_item" ,"cartItem"
+```
+
+##### 01.04 Functions 👈
+- Should Use snake_case
+```injectablephp
+//Should Do
+"show_route"
+
+//Shouldn't Do
+"showRoute" ,"ShowRoute"
+```
+
+##### 01.05 Methods in resources controller 👈
+- Should use camelCase
+- Must use singles words related to action
+```injectablephp
+//Should Do
+"store"
+//Shouldn't Do
+"saveCustomer"
+
+//Should Do
+"show"
+//Shouldn't Do
+"viewCustomer"
+
+//Should Do
+"destroy"
+//Shouldn't Do
+"deleteCustomer"
+
+//Should Do
+"index"
+//Shouldn't Do
+"allCustomersPage"
+```
+
+##### 01.06 Variables 👈
+- Should use camelCase
+- Must use readable words which describe the value.
+```injectablephp
+//Should Do
+$customerMessages;
+//Should't Do
+$CustomerMessages;
+$customer_messages;
+$c_messages;
+$c_m;
+```
+
+##### 01.07 Collection 👈
+- Must describe the value.
+- Must be plural
+```injectablephp
+//Should Do
+$verifiedCustomers = $customer->verified()->get();
+//Should't Do
+$verified;
+$data;
+$resp;
+$v_c;
+```
+
+##### 01.07 Object 👈
+- Must describe the value.
+- Must be singular
+```injectablephp
+//Should Do
+$verifiedCustomer = $customer->verified()->first();
+//Should't Do
+$verified;
+$data;
+$resp;
+$v_c;
+```
+
+##### 01.08 Configs 👈
+- Should use snake_case
+- Must describe the value.
+```injectablephp
+//Should Do
+"comments_enabled"
+//Should't Do
+"CommentsEnabled"
+"comments"
+"c_enabled"
+```
+
+##### 01.09 Traits 👈
+- Should be an adjective.
+```injectablephp
+//Should Do
+"Utility"
+//Shouldn't Do
+"UtilityTrait"
+"Utilities"
+```
+
+##### 01.10 Interface 👈
+- Should be an adjective or a noun.
+```injectablephp
+//Should Do
+"Authenticable"
+//Shouldn't Do
+"AuthenticationInterface"
+"Authenticate"
+```
+
+## Primary Installation
+
+```bash
+$ git clone repo
+$ sudo chmod 777 -R storage
+$ sudo chmod 777 -R bootstrap/cache
+```
+
+## Copy .env files
+
+```bash
+$ cp .env .env.example
+```
+
+## Running the app
+#  The app will run on port 8000
+
+```bash
+$ php artisan serve 
+
+```
