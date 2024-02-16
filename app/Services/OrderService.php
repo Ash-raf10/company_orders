@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Order;
 use App\Models\OrderImage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -30,5 +31,24 @@ class OrderService
     public function saveImage(string $folderName, $file): string
     {
         return Storage::put($folderName, $file);
+    }
+
+    public function processOrderUpdateRequest(OrderCreateRequest $request): array
+    {
+        $requestData = $request->validated();
+
+        return $requestData;
+    }
+
+    public function deletePreviousImage(Order $order)
+    {
+        $order->loadMissing('orderImages');
+
+        if ($order->orderImages && !empty($order->orderImages)) {
+            foreach ($order->orderImages as $image) {
+                Storage::exists($image->image_path) ? Storage::delete($image->image_path) : "";
+                OrderImage::whereId($image->id)->delete();
+            }
+        }
     }
 }

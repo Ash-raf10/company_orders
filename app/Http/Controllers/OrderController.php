@@ -94,29 +94,68 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+        $companies = Company::all('id', 'name');
+
+        return response()->view('orders.form', compact('companies', 'order'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Order  $order
+     * @param OrderCreateRequest $request
+     * @param OrderService $orderService
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Order $order)
+    public function update(OrderCreateRequest $request, Order $order, OrderService $orderService)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $requestData = $orderService->processOrderCreateRequest($request);
+
+            if (isset($requestData['images']) && !empty($requestData['images'])) {
+                $orderImages = $orderService->saveOrderImage($requestData['images']);
+                if (!empty($orderImages)) {
+                    $orderService->deletePreviousImage($order);
+                    $order->orderImages()->saveMany($orderImages);
+                }
+            }
+
+
+            DB::commit();
+
+            session()->flash('notification.success', 'Oder updated successfully!');
+            return redirect()->route('orders.index');
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            DB::rollBack();
+
+            session()->flash('notification.error', 'Something went wrong');
+            return redirect()->back();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Order  $order
+     * @param OrderService $orderService
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy(Order $order, OrderService $orderService)
     {
-        //
+        $order->load('orderImages');
+        $oldOrder = $order->replicate();
+        $delete = $order->delete();
+
+        if ($delete) {
+            $orderService->deletePreviousImage($oldOrder);
+            session()->flash('notification.success', 'Order deleted successfully!');
+
+            return redirect()->route('orders.index');
+        } else {
+            session()->flash('notification.error', 'Something went wrong');
+
+            return redirect()->back();
+        }
     }
 }
