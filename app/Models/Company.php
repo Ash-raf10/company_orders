@@ -19,6 +19,12 @@ class Company extends Model
         'id', 'uuid'
     ];
 
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_code', 'id');
