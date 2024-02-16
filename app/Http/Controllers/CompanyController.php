@@ -107,7 +107,7 @@ class CompanyController extends Controller
         $isUpdated = $company->update($requestData);
 
         if ($isUpdated) {
-            session()->flash('notification.success', 'Post updated successfully!');
+            session()->flash('notification.success', 'Company updated successfully!');
 
             return redirect()->route('companies.index');
         } else {
@@ -122,10 +122,22 @@ class CompanyController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Company  $company
+     * @param  CompanyService $companyService
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Company $company)
+    public function destroy(Company $company, CompanyService $companyService)
     {
-        //
+        $delete = $company->delete();
+
+        if ($delete) {
+            $companyService->deleteSavedImage($company);
+            session()->flash('notification.success', 'Company deleted successfully!');
+
+            return redirect()->route('companies.index');
+        } else {
+            session()->flash('notification.error', 'Something went wrong');
+
+            return redirect()->back();
+        }
     }
 }

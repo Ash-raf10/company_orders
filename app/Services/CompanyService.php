@@ -69,4 +69,11 @@ class CompanyService
 
         return $requestData;
     }
+
+    public function deleteSavedImage(Company $company)
+    {
+        $imageData['commercial_record_image'] = $company->commercial_record_image;
+        $imageData['logo'] = $company->logo;
+        $this->revertSavedImage($imageData);
+    }
 }
