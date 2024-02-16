@@ -38,7 +38,7 @@
                         <div>
                             <x-input-label for="price" value="Price * (decimal)" />
                             <x-text-input id="price" name="price" type="text" class="mt-1 block w-full"
-                                :value="$order->name ?? old('price')" required autofocus />
+                                :value="$order->price ?? old('price')" required autofocus />
                             <x-input-error class="mt-2" :messages="$errors->get('price')" />
                         </div>
 
@@ -59,7 +59,8 @@
                                 @foreach ($order->orderImages as $image)
                                     <div class="shrink-0 my-2">
                                         <img id="logo_preview" class="h-64 w-128 object-cover rounded-md"
-                                            src="{{ isset($image) ? Storage::url($image) : '' }}" alt="Logo Preview" />
+                                            src="{{ isset($image) ? Storage::url($image->image_path) : '' }}"
+                                            alt="Image Preview" />
                                     </div>
                                 @endforeach
                             @endif
