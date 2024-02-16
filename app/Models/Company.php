@@ -18,4 +18,9 @@ class Company extends Model
     protected $guarded = [
         'id', 'uuid'
     ];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_code', 'id');
+    }
 }
