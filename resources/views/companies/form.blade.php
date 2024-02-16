@@ -12,7 +12,7 @@
                 <div class="p-6 text-gray-900">
                     {{-- don't forget to add multipart/form-data so we can accept file in our form --}}
                     <form method="post"
-                        action="{{ isset($company) ? route('companies.update', $company->id) : route('companies.store') }}"
+                        action="{{ isset($company) ? route('companies.update', $company->uuid) : route('companies.store') }}"
                         class="mt-6 space-y-6" enctype="multipart/form-data">
                         @csrf
                         {{-- add @method('put') for edit mode --}}
@@ -45,7 +45,7 @@
                         <div>
                             <x-input-label for="commercial_record_number *" value="Commercial Record Number *" />
                             <x-text-input id="commercial_record_number" name="commercial_record_number" type="text"
-                                class="mt-1 block w-full" :value="$company->commercial_record_code ?? old('commercial_record_number')" required autofocus />
+                                class="mt-1 block w-full" :value="$company->commercial_record_number ?? old('commercial_record_number')" required autofocus />
                             <x-input-error class="mt-2" :messages="$errors->get('commercial_record_number')" />
                         </div>
 
