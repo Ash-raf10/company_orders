@@ -81,7 +81,9 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        $order->load('orderImages', 'company');
+
+        return response()->view('orders.show', compact('order'));
     }
 
     /**
