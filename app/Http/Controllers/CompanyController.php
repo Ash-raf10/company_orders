@@ -68,7 +68,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
+        return response()->view('companies.show', compact('company', $company));
     }
 
     /**
