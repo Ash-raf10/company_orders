@@ -120,14 +120,5 @@
             </div>
         </div>
     </div>
-    <script>
-        // create onchange event listener for featured_image input
-        document.getElementById('featured_image').onchange = function(evt) {
-            const [file] = this.files
-            if (file) {
-                // if there is an image, create a preview in featured_image_preview
-                document.getElementById('featured_image_preview').src = URL.createObjectURL(file)
-            }
-        }
-    </script>
+
 </x-app-layout>
