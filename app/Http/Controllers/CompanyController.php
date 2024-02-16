@@ -7,6 +7,7 @@ use App\Models\Country;
 use Illuminate\Http\Request;
 use App\Services\CompanyService;
 use App\Http\Requests\Company\CompanyCreateRequest;
+use App\Http\Requests\Company\CompanyUpdateRequest;
 
 class CompanyController extends Controller
 {
@@ -19,7 +20,7 @@ class CompanyController extends Controller
     {
         $companies = Company::with('country')->simplePaginate(100);
 
-        return view('companies.index', compact('companies', $companies));
+        return view('companies.index', compact('companies'));
     }
 
     /**
@@ -31,7 +32,7 @@ class CompanyController extends Controller
     {
         $countries = Country::all('id', 'name');
 
-        return response()->view('companies.form', compact('countries', $countries));
+        return response()->view('companies.form', compact('countries'));
     }
 
     /**
@@ -68,7 +69,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        return response()->view('companies.show', compact('company', $company));
+        return response()->view('companies.show', compact('company'));
     }
 
     /**
@@ -79,19 +80,42 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        //
+        $countries = Country::all('id', 'name');
+
+        return response()->view('companies.form', compact(
+            'countries',
+            'company'
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CompanyUpdateRequest  $request
      * @param  \App\Models\Company  $company
+     * @param  CompanyService $companyService
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Company $company)
-    {
-        //
+    public function update(
+        CompanyUpdateRequest $request,
+        Company $company,
+        CompanyService $companyService
+    ) {
+
+        $requestData = $companyService->processCompanyUpdateData($request, $company);
+
+        $isUpdated = $company->update($requestData);
+
+        if ($isUpdated) {
+            session()->flash('notification.success', 'Post updated successfully!');
+
+            return redirect()->route('companies.index');
+        } else {
+            $this->revertSavedImage($requestData);
+            session()->flash('notification.error', 'Something went wrong');
+
+            return redirect()->back();
+        }
     }
 
     /**
