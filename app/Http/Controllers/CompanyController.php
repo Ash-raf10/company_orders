@@ -127,10 +127,11 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company, CompanyService $companyService)
     {
+        $oldCompany = $company->replicate();
         $delete = $company->delete();
 
         if ($delete) {
-            $companyService->deleteSavedImage($company);
+            $companyService->deleteSavedImage($oldCompany);
             session()->flash('notification.success', 'Company deleted successfully!');
 
             return redirect()->route('companies.index');
