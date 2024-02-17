@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\CompanyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,4 +24,10 @@ Route::middleware('auth.jwt')->controller(AuthController::class)->group(function
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
     Route::get('me', 'me');
+});
+
+
+
+Route::middleware('auth.jwt')->group(function () {
+    Route::apiResource('companies', CompanyController::class);
 });
