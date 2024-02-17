@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\CompanyController;
+use App\Http\Controllers\Api\V1\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +31,5 @@ Route::middleware('auth.jwt')->controller(AuthController::class)->group(function
 
 Route::middleware('auth.jwt')->group(function () {
     Route::apiResource('companies', CompanyController::class);
+    Route::apiResource('orders', OrderController::class);
 });
