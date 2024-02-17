@@ -361,3 +361,38 @@ $ cp .env .env.example
 $ php artisan serve 
 
 ```
+
+## Run seeder
+#  this will run the user seeder and country seeder
+
+```bash
+$ php artisan db:seed 
+
+```
+
+## Login Credentials
+#  use the below credentials for login
+
+```bash
+$ username : ashraf@admin.com
+$ password : secret123
+
+```
+
+## Update .env
+#  update app url if using port and file disk
+
+```bash
+$ APP_URL= http://localhost:8000
+$ FILESYSTEM_DISK=public
+
+```
+
+## generate jwt secret
+#  this command will generate jwt secret and will update the .env
+
+```bash
+$ php artisan jwt:secret
+
+```
+
