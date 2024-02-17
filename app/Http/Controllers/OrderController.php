@@ -112,6 +112,8 @@ class OrderController extends Controller
             DB::beginTransaction();
             $requestData = $orderService->processOrderCreateRequest($request);
 
+            $order->update($requestData);
+
             if (isset($requestData['images']) && !empty($requestData['images'])) {
                 $orderImages = $orderService->saveOrderImage($requestData['images']);
                 if (!empty($orderImages)) {
