@@ -395,4 +395,6 @@ $ FILESYSTEM_DISK=public
 $ php artisan jwt:secret
 
 ```
+## Postman Collection
+# This is the link for the [postman collection](https://drive.google.com/file/d/1DsMBQddy2n1sY7XQog3bildiG4DT7eSB/view?usp=drive_link) for this repo
 
